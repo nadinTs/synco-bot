@@ -7,3 +7,7 @@
 - **Backend**: Python 3.11, FastAPI, SQLAlchemy, Pydantic, Uvicorn, aiosmtplib.
 - **Database**: PostgreSQL.
 - **DevOps**: Docker, Docker Compose.
+
+<img width="441" height="349" alt="image" src="https://github.com/user-attachments/assets/6426fd7b-cf71-4153-bf65-a547e590a297" />
+
+<img width="393" height="469" alt="image" src="https://github.com/user-attachments/assets/620c3a65-3d06-4f1a-bdd7-b93d6dda3118" />
