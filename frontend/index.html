@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synco - Групповой Календарь</title>
+    <!-- Подключение локального скомпилированного файла Tailwind CSS -->
+    <link href="/static/tailwind.css" rel="stylesheet">
+    <script src="https://telegram.org"></script>
+    <script src="https://unpkg.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-indigo-500 selection:text-white">
+
+    <div class="max-w-md mx-auto p-4 min-h-screen flex flex-col">
+        <!-- Шапка приложения -->
+        <header class="flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-xs border border-slate-100">
+            <div>
+                <h1 class="text-2xl font-black text-indigo-600 tracking-tight">SyncoBot</h1>
+                <p class="text-xs text-slate-400 font-medium">Семейный кросс-календарь</p>
+            </div>
+            <span id="user-name" class="text-xs bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-full font-semibold border border-indigo-100">Пользователь</span>
+        </header>
+
+        <!-- Сетка календаря на текущую неделю -->
+        <section class="mb-6">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 px-1">Текущая неделя</h3>
+            <div id="calendar-grid" class="grid grid-cols-7 gap-2">
+                <!-- Генерируется динамически через app.js -->
+            </div>
+        </section>
+
+        <!-- Список событий на выбранный день -->
+        <main class="flex-1 flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="selected-day-title" class="text-lg font-bold text-slate-900">Планы</h2>
+                <button onclick="openCreateModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs px-3 py-2 rounded-xl transition-all shadow-xs flex items-center gap-1">
+                    ➕ Добавить
+                </button>
+            </div>
+            <div id="events-list" class="space-y-3 flex-1">
+                <!-- Карточки планов вставляются через app.js -->
+            </div>
+        </main>
+
+        <!-- МОДАЛЬНОЕ ОКНО: Создание и Редактирование -->
+        <div id="event-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+            <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-xl space-y-4 border border-slate-100 transform transition-all">
+                <div class="flex justify-between items-center">
+                    <h3 id="modal-title" class="text-lg font-bold text-slate-900">Новое событие</h3>
+                    <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600">✕</button>
+                </div>
+                
+                <form id="event-form" class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Что планируем:</label>
+                        <input type="text" id="form-title" class="w-full border border-slate-200 focus:border-indigo-500 rounded-xl px-3 py-2.5 text-sm focus:outline-hidden transition" placeholder="Например: Семейный ужин" required>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Описание / Детали:</label>
+                        <textarea id="form-desc" class="w-full border border-slate-200 focus:border-indigo-500 rounded-xl px-3 py-2 text-sm focus:outline-hidden transition h-20 placeholder="Принести пирог"" placeholder="Детали плана"></textarea>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="col-span-2">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Дата и время:</label>
+                            <input type="datetime-local" id="form-date" class="w-full border border-slate-200 focus:border-indigo-500 rounded-xl px-3 py-2 text-sm focus:outline-hidden transition" required>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Цвет плашки:</label>
+                            <input type="color" id="form-color" class="w-full h-[38px] border border-slate-200 rounded-xl p-1 bg-white cursor-pointer" value="#3b82f6">
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col gap-2 pt-2">
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-sm">Сохранить</button>
+                        <button type="button" id="btn-delete" class="hidden w-full bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold py-2.5 rounded-xl text-sm transition border border-rose-100">❌ Удалить план</button>
+                        <button type="button" onclick="closeModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium py-2.5 rounded-xl text-sm transition">Отмена</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

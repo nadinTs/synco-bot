@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+
+# IDE и Системные файлы
+.idea/
+.vscode/
+.DS_Store
+
+# Базы данных и Логи
+*.db
+*.log
+
+# Локальные переменные окружения и сертификаты
+.env
+*.crt
