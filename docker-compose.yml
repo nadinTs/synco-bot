@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # Сервис базы данных PostgreSQL
+  db:
+    image: postgres:15-alpine
+    container_name: synco_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: synco_user
+      POSTGRES_PASSWORD: secret_password
+      POSTGRES_DB: synco_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Сервис нашего FastAPI сервера
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    container_name: synco_backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://synco_user:secret_password@db:5432/synco_db
+    volumes:
+      - ./backend:/app/backend
+      - ./frontend:/app/frontend
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:

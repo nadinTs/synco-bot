@@ -43,7 +43,7 @@ async def create_event(event: EventCreateSchema, db: Session = Depends(get_db)):
     
     alert_msg = f"📅 {event.creator_name} добавил план: '{event.title}' на {event.event_date.strftime('%d.%m в %H:%M')}"
     notifier.send_messenger_broadcast(alert_msg)
-    await notifier.send_email_alerts("Новый семейный план", alert_msg)
+    await notifier.send_email_alerts("Новый план", alert_msg)
     return db_event
 
 @app.put("/api/events/{event_id}", response_model=EventResponseSchema)
@@ -79,10 +79,26 @@ async def delete_event(event_id: int, creator_name: str, db: Session = Depends(g
     await notifier.send_email_alerts("Удаление из календаря", alert_msg)
     return {"status": "deleted", "id": event_id}
 
-# Раздача статического контента фронтенда
-app.mount("/static", StaticFiles(directory="../frontend"), name="static")
+# # Раздача статического контента фронтенда
+# app.mount("/static", StaticFiles(directory="../frontend"), name="static")
+
+# @app.get("/", response_class=HTMLResponse)
+# def read_index():
+#     with open("../frontend/index.html", "r", encoding="utf-8") as f:
+#         return f.read()
+import os
+
+# 1. Вычисляем абсолютный путь к папке backend, где лежит этот main.py
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# 2. Вычисляем путь к соседней папке frontend (выходим на уровень выше и заходим во frontend)
+FRONTEND_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", "frontend"))
+
+# 3. Передаем вычисленный железный путь в FastAPI
+app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
 @app.get("/", response_class=HTMLResponse)
 def read_index():
-    with open("../frontend/index.html", "r", encoding="utf-8") as f:
+    index_path = os.path.join(FRONTEND_DIR, "index.html")
+    with open(index_path, "r", encoding="utf-8") as f:
         return f.read()

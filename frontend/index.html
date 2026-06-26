@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synco - Групповой Календарь</title>
-    <!-- Подключение локального скомпилированного файла Tailwind CSS -->
     <link href="/static/tailwind.css" rel="stylesheet">
-    <script src="https://telegram.org"></script>
+    <!-- <script src="https://tailwindcss.com"></script> -->
+
+    <script src="/static/mocks.js"></script>
+    <!-- <script src="https://telegram.org"></script> -->
     <script src="https://unpkg.com"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-indigo-500 selection:text-white">
@@ -16,7 +18,7 @@
         <header class="flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-xs border border-slate-100">
             <div>
                 <h1 class="text-2xl font-black text-indigo-600 tracking-tight">SyncoBot</h1>
-                <p class="text-xs text-slate-400 font-medium">Семейный кросс-календарь</p>
+                <p class="text-xs text-slate-400 font-medium">Кросс-календарь</p>
             </div>
             <span id="user-name" class="text-xs bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-full font-semibold border border-indigo-100">Пользователь</span>
         </header>
