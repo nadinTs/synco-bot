@@ -11,26 +11,37 @@ services:
       POSTGRES_PASSWORD: secret_password
       POSTGRES_DB: synco_db
     ports:
-      - "5432:5432"
+      - "5432:5432" # TODO: для подключения через DBeaver/pgAdmin (закоментировать при отправке в облако)
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  # Сервис нашего FastAPI сервера
+  # Сервис FastAPI сервера
   backend:
     build:
       context: .
       dockerfile: ./backend/Dockerfile
     container_name: synco_backend
     restart: always
-    ports:
-      - "8000:8000"
     environment:
       - DATABASE_URL=postgresql://synco_user:secret_password@db:5432/synco_db
     volumes:
       - ./backend:/app/backend
-      - ./frontend:/app/frontend
     depends_on:
       - db
+
+  #  Сервис веб-сервера Nginx
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: synco_nginx
+    restart: always
+    ports:
+      - "80:80"   
+      - "443:443" # TODO: Задел на будущее для HTTPS в Яндекс Облаке
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:

@@ -21,3 +21,8 @@ env/
 *.crt
 
 /node_modules
+
+
+# Расширения VS Code для баз данных (SQLTools / Database Client)
+*.session.sql
+.sqltools/
