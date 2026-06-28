@@ -5,8 +5,8 @@ DATABASE_URL = os.getenv(
     "postgresql://synco_user:secret_password@localhost:5432/synco_db"
 )
 
-TG_TOKEN = "ВАШ_ТЕЛЕГРАМ_ТОКЕН"
-VK_TOKEN = "ВАШ_ВК_ТОКЕН"
+TG_TOKEN = "" # TODO: Настоящий токен добавить
+VK_TOKEN = "" # TODO: Настоящий токен добавить
 
 SMTP_HOST = "smtp.yandex.ru"
 SMTP_PORT = 465

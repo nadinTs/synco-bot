@@ -1,11 +1,8 @@
 from typing import List
 from fastapi import FastAPI, Depends, HTTPException
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
-# Импортируем наши новые чистые модули
 from backend.database.connection import engine, Base, get_db
 from backend.database.models import DbEvent
 from backend.schemas.event import EventCreateSchema, EventResponseSchema
@@ -14,7 +11,12 @@ from backend.core import notifier
 # Создаем таблицы при старте, если их нет в Postgres
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Synco API")
+app = FastAPI(
+    title="Synco API",
+    root_path="/api", # Это автоматически добавит /api ко ВСЕМ эндпоинтам ниже!
+    docs_url="/docs",
+    openapi_url="/openapi.json"
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,11 +26,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/api/events", response_model=List[EventResponseSchema])
+# Было /api/events -> Стало /events (префикс /api добавится автоматически!)
+@app.get("/events", response_model=List[EventResponseSchema])
 def get_week_events(db: Session = Depends(get_db)):
     return db.query(DbEvent).order_by(DbEvent.event_date).all()
 
-@app.post("/api/events", response_model=EventResponseSchema)
+@app.post("/events", response_model=EventResponseSchema)
 async def create_event(event: EventCreateSchema, db: Session = Depends(get_db)):
     db_event = DbEvent(
         title=event.title,
@@ -46,7 +49,7 @@ async def create_event(event: EventCreateSchema, db: Session = Depends(get_db)):
     await notifier.send_email_alerts("Новый план", alert_msg)
     return db_event
 
-@app.put("/api/events/{event_id}", response_model=EventResponseSchema)
+@app.put("/events/{event_id}", response_model=EventResponseSchema)
 async def update_event(event_id: int, event: EventCreateSchema, db: Session = Depends(get_db)):
     db_event = db.query(DbEvent).filter(DbEvent.id == event_id).first()
     if not db_event:
@@ -64,7 +67,7 @@ async def update_event(event_id: int, event: EventCreateSchema, db: Session = De
     await notifier.send_email_alerts("Обновление календаря", alert_msg)
     return db_event
 
-@app.delete("/api/events/{event_id}")
+@app.delete("/events/{event_id}")
 async def delete_event(event_id: int, creator_name: str, db: Session = Depends(get_db)):
     db_event = db.query(DbEvent).filter(DbEvent.id == event_id).first()
     if not db_event:
@@ -78,27 +81,3 @@ async def delete_event(event_id: int, creator_name: str, db: Session = Depends(g
     notifier.send_messenger_broadcast(alert_msg)
     await notifier.send_email_alerts("Удаление из календаря", alert_msg)
     return {"status": "deleted", "id": event_id}
-
-# # Раздача статического контента фронтенда
-# app.mount("/static", StaticFiles(directory="../frontend"), name="static")
-
-# @app.get("/", response_class=HTMLResponse)
-# def read_index():
-#     with open("../frontend/index.html", "r", encoding="utf-8") as f:
-#         return f.read()
-import os
-
-# 1. Вычисляем абсолютный путь к папке backend, где лежит этот main.py
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# 2. Вычисляем путь к соседней папке frontend (выходим на уровень выше и заходим во frontend)
-FRONTEND_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", "frontend"))
-
-# 3. Передаем вычисленный железный путь в FastAPI
-app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
-
-@app.get("/", response_class=HTMLResponse)
-def read_index():
-    index_path = os.path.join(FRONTEND_DIR, "index.html")
-    with open(index_path, "r", encoding="utf-8") as f:
-        return f.read()
