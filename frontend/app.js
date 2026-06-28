@@ -196,7 +196,7 @@ document.getElementById('event-form').addEventListener('submit', async (e) => {
 });
 
 async function deleteEvent(eventId) {
-    if (!confirm("Вы уверены, что хотите удалить этот план вашей семьи?")) return;
+    if (!confirm("Вы уверены, что хотите удалить этот план?")) return;
     
     const response = await fetch(`/api/events/${eventId}?creator_name=${encodeURIComponent(currentUserName)}`, {
         method: 'DELETE'
