@@ -7,22 +7,22 @@ async def test_create_plan(client: AsyncClient):
     payload = {
         "title": "Семейный ужин",
         "description": "Принести пирог и хорошее настроение",
-        "date": "2026-06-30T19:00:00",
-        "color": "#3b82f6",
-        "creator_role": "Мама"
+        "event_date": "2026-06-30T19:00:00",
+        "color_tag": "#3b82f6",
+        "creator_name": "Мама"
     }
     # тестируем чистый эндпоинт FastAPI
-    response = await client.post("/api/plans", json=payload)
+    response = await client.post("/api/events", json=payload)
     
-    assert response.status_code == 201
+    assert response.status_code == 200
     data = response.json()
     assert data["title"] == "Семейный ужин"
-    assert data["creator_role"] == "Мама"
+    assert data["creator_name"] == "Мама"
     assert "id" in data
 
 @pytest.mark.asyncio
 async def test_get_plans_empty(client: AsyncClient):
     # Проверяем, что изначально планов нет
-    response = await client.get("/api/plans")
+    response = await client.get("/api/events")
     assert response.status_code == 200
     assert response.json() == []

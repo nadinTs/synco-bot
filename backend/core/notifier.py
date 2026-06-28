@@ -20,7 +20,7 @@ async def send_email_alerts(subject: str, text: str):
 def send_messenger_broadcast(text: str):
     # Telegram Push
     try:
-        tg_url = f"https://telegram.org{TG_TOKEN}/sendMessage"
+        tg_url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
         requests.post(tg_url, json={"chat_id": -1001234567, "text": text}, timeout=5)
     except Exception as e:
         print(f"Ошибка отправки в TG: {e}")

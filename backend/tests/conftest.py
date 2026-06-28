@@ -2,31 +2,32 @@ import pytest
 import pytest_asyncio
 from typing import AsyncGenerator
 from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from backend.main import app
 from backend.database.connection import get_db, Base
 
-# Отдельная тестовая БД
-TEST_DATABASE_URL = "postgresql+asyncpg://synco_user:secret_password@db:5432/synco_test_db"
+# Синхронное подключение к тестовой базе данных
+TEST_DATABASE_URL = "postgresql://synco_user:secret_password@db:5432/synco_test_db"
 
-engine = create_async_engine(TEST_DATABASE_URL, echo=False)
-TestingSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+engine = create_engine(TEST_DATABASE_URL, echo=False)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 @pytest.fixture(autouse=True)
-async def init_db():
+def init_db():
     # Создаем таблицы перед тестом и удаляем после
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    Base.metadata.create_all(bind=engine)
     yield
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+    Base.metadata.drop_all(bind=engine)
 
-async def override_get_db() -> AsyncGenerator:
-    async with TestingSessionLocal() as session:
-        yield session
+def override_get_db():
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
-# Подменяем реальную БД на тестовую в FastAPI
+# Подменяем реальную БД на тестовую синхронную в FastAPI
 app.dependency_overrides[get_db] = override_get_db
 
 @pytest_asyncio.fixture
