@@ -1,0 +1,47 @@
+version: '3.8'
+
+networks:
+  synco_network:
+    driver: bridge
+
+volumes:
+  postgres_prod_data:
+
+services:
+  synco_db:
+    image: postgres:15-alpine
+    container_name: synco_db_prod
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    networks:
+      - synco_network
+    restart: always
+
+  synco_backend:
+    image: cr.yandex/<REGISTRY_ID>/synco-backend:latest
+    container_name: synco_backend_prod
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - VK_SECRET_TOKEN=${VK_SECRET_TOKEN}
+    depends_on:
+      - synco_db
+    networks:
+      - synco_network
+    restart: always
+
+  synco_nginx:
+    image: cr.yandex/<REGISTRY_ID>/synco-nginx:latest
+    container_name: synco_nginx_prod
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - synco_backend
+    networks:
+      - synco_network
+    restart: always
